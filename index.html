@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alma Mater</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f4f4;
+    color: #111;
+  }
+
+  .container {
+    max-width: 420px;
+    margin: auto;
+    padding: 20px;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .tagline {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  img {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+
+  .name {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .sport {
+    text-align: center;
+    color: #777;
+    margin-bottom: 12px;
+  }
+
+  .autocomplete {
+    position: relative;
+  }
+
+  input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  .suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    max-height: 180px;
+    overflow-y: auto;
+    z-index: 10;
+  }
+
+  .suggestion {
+    padding: 10px;
+    cursor: pointer;
+  }
+
+  .suggestion:hover {
+    background: #eee;
+  }
+
+  .feedback {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 14px;
+  }
+
+  .correct { color: #1a7f37; }
+  .wrong { color: #b42318; }
+
+  .stats {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 14px;
+    color: #444;
+  }
+</style>
+</head>
+
+<body>
+<div class="container">
+  <h1>Alma Mater</h1>
+  <div class="tagline">Name the college. Test your ball knowledge.</div>
+
+  <div class="card">
+    <img id="athleteImg">
+    <div id="athleteName" class="name"></div>
+    <div id="athleteSport" class="sport"></div>
+
+    <div class="autocomplete">
+      <input id="collegeInput" placeholder="Start typing a college..." autocomplete="off">
+      <div id="suggestions" class="suggestions"></div>
+    </div>
+
+    <div id="feedback" class="feedback"></div>
+  </div>
+
+  <div class="stats">
+    Streak: <span id="streak">0</span> |
+    Best: <span id="best">0</span>
+  </div>
+</div>
+
+<script>
+const athletes = [
+  { name: "Stephen Curry", sport: "NBA", image: "https://upload.wikimedia.org/wikipedia/commons/8/82/Stephen_Curry_dribbling_2016.jpg", colleges: ["Davidson College"] },
+  { name: "Kevin Durant", sport: "NBA", image: "https://upload.wikimedia.org/wikipedia/commons/3/3c/Kevin_Durant_2017.jpg", colleges: ["University of Texas"] },
+  { name: "Kawhi Leonard", sport: "NBA", image: "https://upload.wikimedia.org/wikipedia/commons/1/10/Kawhi_Leonard_2019.jpg", colleges: ["San Diego State University"] },
+  { name: "Jayson Tatum", sport: "NBA", image: "https://upload.wikimedia.org/wikipedia/commons/8/89/Jayson_Tatum_2022.jpg", colleges: ["Duke University"] },
+  { name: "Jimmy Butler", sport: "NBA", image: "https://upload.wikimedia.org/wikipedia/commons/5/5b/Jimmy_Butler_2020.jpg", colleges: ["Marquette University"] },
+
+  { name: "Tom Brady", sport: "NFL", image: "https://upload.wikimedia.org/wikipedia/commons/5/55/Tom_Brady_2019.jpg", colleges: ["University of Michigan"] },
+  { name: "Josh Allen", sport: "NFL", image: "https://upload.wikimedia.org/wikipedia/commons/7/7a/Josh_Allen_Bills.jpg", colleges: ["University of Wyoming"] },
+  { name: "Joe Burrow", sport: "NFL", image: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Joe_Burrow_2022.jpg", colleges: ["Louisiana State University"] },
+  { name: "Christian McCaffrey", sport: "NFL", image: "https://upload.wikimedia.org/wikipedia/commons/4/47/Christian_McCaffrey_2022.jpg", colleges: ["Stanford University"] },
+  { name: "Saquon Barkley", sport: "NFL", image: "https://upload.wikimedia.org/wikipedia/commons/0/02/Saquon_Barkley_2019.jpg", colleges: ["Pennsylvania State University"] }
+];
+
+const colleges = [
+  "University of Michigan", "University of Wyoming", "University of Texas",
+  "Davidson College", "Duke University", "Louisiana State University",
+  "San Diego State University", "Marquette University", "Stanford University",
+  "Pennsylvania State University"
+];
+
+const abbreviations = {
+  "lsu": "louisiana state",
+  "psu": "pennsylvania state"
+};
+
+let currentAthlete;
+let streak = 0;
+let best = localStorage.getItem("best") || 0;
+
+document.getElementById("best").textContent = best;
+
+const input = document.getElementById("collegeInput");
+const suggestionsBox = document.getElementById("suggestions");
+const feedback = document.getElementById("feedback");
+
+function normalizeSchool(name) {
+  return name.toLowerCase()
+    .replace("university of ", "")
+    .replace("college", "")
+    .replace(/[^a-z\s]/g, "")
+    .trim();
+}
+
+function loadAthlete() {
+  feedback.textContent = "";
+  input.value = "";
+  suggestionsBox.innerHTML = "";
+  currentAthlete = athletes[Math.floor(Math.random() * athletes.length)];
+  athleteImg.src = currentAthlete.image;
+  athleteName.textContent = currentAthlete.name;
+  athleteSport.textContent = currentAthlete.sport;
+}
+
+input.addEventListener("input", () => {
+  const value = input.value.toLowerCase();
+  suggestionsBox.innerHTML = "";
+  if (!value) return;
+
+  colleges.filter(c => c.toLowerCase().includes(value)).forEach(college => {
+    const div = document.createElement("div");
+    div.textContent = college;
+    div.className = "suggestion";
+    div.onclick = () => {
+      input.value = college;
+      suggestionsBox.innerHTML = "";
+      checkAnswer(college);
+    };
+    suggestionsBox.appendChild(div);
+  });
+});
+
+function checkAnswer(answer) {
+  let user = answer.toLowerCase().trim();
+  if (abbreviations[user]) user = abbreviations[user];
+  user = normalizeSchool(user);
+
+  const correct = currentAthlete.colleges.some(c => normalizeSchool(c) === user);
+
+  if (correct) {
+    streak++;
+    feedback.textContent = "Correct";
+    feedback.className = "feedback correct";
+  } else {
+    streak = 0;
+    feedback.textContent = "Wrong: " + currentAthlete.colleges.join(", ");
+    feedback.className = "feedback wrong";
+  }
+
+  if (streak > best) {
+    best = streak;
+    localStorage.setItem("best", best);
+    document.getElementById("best").textContent = best;
+  }
+
+  document.getElementById("streak").textContent = streak;
+
+  setTimeout(loadAthlete, 900);
+}
+
+loadAthlete();
+</script>
+</body>
+</html>
