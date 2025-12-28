@@ -89,74 +89,71 @@ input {
 .unlocked {
   background: #d6f5dd;
 }
-.leaderboard div {
-  font-size: 14px;
-}
 </style>
 </head>
 
 <body>
 <div class="container">
-<h1>Alma Mater</h1>
-<div class="tagline">Name the college. Test your ball knowledge.</div>
+  <h1>Alma Mater</h1>
+  <div class="tagline">Name the college. Test your ball knowledge.</div>
 
-<button onclick="setMode('normal')">Normal Mode</button>
-<button onclick="setMode('daily')">Daily Challenge</button>
+  <button onclick="setMode('normal')">Normal Mode</button>
+  <button onclick="setMode('daily')">Daily Challenge</button>
 
-<div class="card">
-<img id="img">
-<div id="name" class="name"></div>
-<div id="sport" class="sport"></div>
-<input id="input" placeholder="Type the college..." autocomplete="off">
-<div id="feedback" class="feedback"></div>
-</div>
+  <div class="card">
+    <img id="athleteImg">
+    <div id="athleteName" class="name"></div>
+    <div id="athleteSport" class="sport"></div>
+    <input id="answerInput" placeholder="Type the college..." autocomplete="off">
+    <div id="feedback" class="feedback"></div>
+  </div>
 
-<div class="stats">
-Streak: <span id="streak">0</span> |
-Best: <span id="best">0</span> |
-Daily: <span id="daily">0</span>/10
-</div>
+  <div class="stats">
+    Streak: <span id="streak">0</span> |
+    Best: <span id="best">0</span> |
+    Daily: <span id="daily">0</span>/10
+  </div>
 
-<div class="section">
-<strong>Achievements</strong>
-<div id="achievements"></div>
-</div>
-
-<div class="section">
-<strong>Leaderboard</strong>
-<input id="username" placeholder="Enter username">
-<div id="leaderboard"></div>
-</div>
+  <div class="section">
+    <strong>Achievements</strong>
+    <div id="achievements"></div>
+  </div>
 </div>
 
 <script>
-const athletes = [
-  // NBA
-  {n:"Damian Lillard", s:"NBA", c:"Weber State", i:"https://upload.wikimedia.org/wikipedia/commons/3/3f/Damian_Lillard_2021.jpg"},
-  {n:"CJ McCollum", s:"NBA", c:"Lehigh", i:"https://upload.wikimedia.org/wikipedia/commons/8/8f/CJ_McCollum_2021.jpg"},
-  {n:"Ja Morant", s:"NBA", c:"Murray State", i:"https://upload.wikimedia.org/wikipedia/commons/2/2a/Ja_Morant_2022.jpg"},
-  {n:"Paul George", s:"NBA", c:"Fresno State", i:"https://upload.wikimedia.org/wikipedia/commons/5/5a/Paul_George_2021.jpg"},
-  {n:"Klay Thompson", s:"NBA", c:"Washington State", i:"https://upload.wikimedia.org/wikipedia/commons/6/6b/Klay_Thompson_2019.jpg"},
-  {n:"Gordon Hayward", s:"NBA", c:"Butler", i:"https://upload.wikimedia.org/wikipedia/commons/7/7c/Gordon_Hayward_2019.jpg"},
-  {n:"Kyle Lowry", s:"NBA", c:"Villanova", i:"https://upload.wikimedia.org/wikipedia/commons/6/64/Kyle_Lowry_2019.jpg"},
-  {n:"Fred VanVleet", s:"NBA", c:"Wichita State", i:"https://upload.wikimedia.org/wikipedia/commons/3/32/Fred_VanVleet_2020.jpg"},
-  {n:"Jimmy Butler", s:"NBA", c:"Marquette", i:"https://upload.wikimedia.org/wikipedia/commons/5/5b/Jimmy_Butler_2020.jpg"},
-  {n:"Kawhi Leonard", s:"NBA", c:"San Diego State", i:"https://upload.wikimedia.org/wikipedia/commons/1/10/Kawhi_Leonard_2019.jpg"},
+/* ---------- ELEMENTS ---------- */
+const athleteImg = document.getElementById("athleteImg");
+const athleteName = document.getElementById("athleteName");
+const athleteSport = document.getElementById("athleteSport");
+const answerInput = document.getElementById("answerInput");
+const feedback = document.getElementById("feedback");
+const streakEl = document.getElementById("streak");
+const bestEl = document.getElementById("best");
+const dailyEl = document.getElementById("daily");
+const achievementsBox = document.getElementById("achievements");
 
-  // NFL
-  {n:"Josh Allen", s:"NFL", c:"Wyoming", i:"https://upload.wikimedia.org/wikipedia/commons/7/7a/Josh_Allen_Bills.jpg"},
-  {n:"Cooper Kupp", s:"NFL", c:"Eastern Washington", i:"https://upload.wikimedia.org/wikipedia/commons/3/3d/Cooper_Kupp_2022.jpg"},
-  {n:"Khalil Mack", s:"NFL", c:"Buffalo", i:"https://upload.wikimedia.org/wikipedia/commons/5/55/Khalil_Mack_2020.jpg"},
-  {n:"Carson Wentz", s:"NFL", c:"North Dakota State", i:"https://upload.wikimedia.org/wikipedia/commons/3/38/Carson_Wentz_2019.jpg"},
-  {n:"Trey Lance", s:"NFL", c:"North Dakota State", i:"https://upload.wikimedia.org/wikipedia/commons/3/38/Trey_Lance_2021.jpg"},
-  {n:"Jimmy Garoppolo", s:"NFL", c:"Eastern Illinois", i:"https://upload.wikimedia.org/wikipedia/commons/6/6e/Jimmy_Garoppolo_2019.jpg"},
-  {n:"Joe Flacco", s:"NFL", c:"Delaware", i:"https://upload.wikimedia.org/wikipedia/commons/0/0e/Joe_Flacco_2019.jpg"},
-  {n:"Steve McNair", s:"NFL", c:"Alcorn State", i:"https://upload.wikimedia.org/wikipedia/commons/6/6c/Steve_McNair.jpg"},
-  {n:"Tony Romo", s:"NFL", c:"Eastern Illinois", i:"https://upload.wikimedia.org/wikipedia/commons/1/1c/Tony_Romo_2017.jpg"},
-  {n:"Ryan Fitzpatrick", s:"NFL", c:"Harvard", i:"https://upload.wikimedia.org/wikipedia/commons/2/25/Ryan_Fitzpatrick_2021.jpg"}
+/* ---------- DATA ---------- */
+const athletes = [
+  {name:"Damian Lillard", sport:"NBA", college:"Weber State", img:"https://upload.wikimedia.org/wikipedia/commons/3/3f/Damian_Lillard_2021.jpg"},
+  {name:"CJ McCollum", sport:"NBA", college:"Lehigh", img:"https://upload.wikimedia.org/wikipedia/commons/8/8f/CJ_McCollum_2021.jpg"},
+  {name:"Ja Morant", sport:"NBA", college:"Murray State", img:"https://upload.wikimedia.org/wikipedia/commons/2/2a/Ja_Morant_2022.jpg"},
+  {name:"Paul George", sport:"NBA", college:"Fresno State", img:"https://upload.wikimedia.org/wikipedia/commons/5/5a/Paul_George_2021.jpg"},
+  {name:"Josh Allen", sport:"NFL", college:"Wyoming", img:"https://upload.wikimedia.org/wikipedia/commons/7/7a/Josh_Allen_Bills.jpg"},
+  {name:"Cooper Kupp", sport:"NFL", college:"Eastern Washington", img:"https://upload.wikimedia.org/wikipedia/commons/3/3d/Cooper_Kupp_2022.jpg"},
+  {name:"Khalil Mack", sport:"NFL", college:"Buffalo", img:"https://upload.wikimedia.org/wikipedia/commons/5/55/Khalil_Mack_2020.jpg"},
+  {name:"Joe Flacco", sport:"NFL", college:"Delaware", img:"https://upload.wikimedia.org/wikipedia/commons/0/0e/Joe_Flacco_2019.jpg"},
+  {name:"Steve McNair", sport:"NFL", college:"Alcorn State", img:"https://upload.wikimedia.org/wikipedia/commons/6/6c/Steve_McNair.jpg"}
 ];
 
-// shuffle helper
+/* ---------- STATE ---------- */
+let queue = shuffle([...athletes]);
+let index = 0;
+let current;
+let streak = 0;
+let best = localStorage.getItem("best") || 0;
+let daily = 0;
+
+/* ---------- HELPERS ---------- */
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -165,111 +162,67 @@ function shuffle(arr) {
   return arr;
 }
 
-let queue = shuffle([...athletes]);
-let index = 0;
-let current;
-let streak = 0;
-let best = localStorage.getItem("best") || 0;
-let daily = 0;
-let mode = "normal";
-
-const achievements = [
-  {name:"🏀 First Bucket", check:()=>localStorage.total>=1},
-  {name:"🔥 Heating Up", check:()=>streak>=5},
-  {name:"🚀 On a Run", check:()=>streak>=10},
-  {name:"🧠 College Hooper", check:()=>localStorage.total>=25},
-  {name:"🎓 Campus Legend", check:()=>localStorage.total>=50},
-  {name:"📅 Perfect Day", check:()=>daily===10}
-];
-
-function normalize(t) {
-  return t.toLowerCase().replace("university","").replace("college","").replace(/[^a-z\s]/g,"").trim();
+function normalize(text) {
+  return text.toLowerCase()
+    .replace("university", "")
+    .replace("college", "")
+    .replace(/[^a-z\s]/g, "")
+    .trim();
 }
 
+/* ---------- GAME LOGIC ---------- */
 function nextAthlete() {
   if (index >= queue.length) {
     queue = shuffle([...athletes]);
     index = 0;
   }
   current = queue[index++];
-  img.src = current.i;
-  name.textContent = current.n;
-  sport.textContent = current.s;
+  athleteImg.src = current.img;
+  athleteName.textContent = current.name;
+  athleteSport.textContent = current.sport;
 }
 
-input.addEventListener("keydown", e => {
+answerInput.addEventListener("keydown", e => {
   if (e.key === "Enter") {
-    const correct = normalize(input.value) === normalize(current.c);
+    const correct = normalize(answerInput.value) === normalize(current.college);
     if (correct) {
       streak++;
       daily++;
-      localStorage.total = (parseInt(localStorage.total || 0) + 1);
       feedback.textContent = "Correct";
       feedback.className = "feedback correct";
     } else {
       streak = 0;
-      feedback.textContent = "Wrong: " + current.c;
+      feedback.textContent = "Wrong: " + current.college;
       feedback.className = "feedback wrong";
     }
     if (streak > best) {
       best = streak;
-      localStorage.best = best;
-      saveScore();
+      localStorage.setItem("best", best);
     }
-    update();
-    input.value = "";
+    updateStats();
+    answerInput.value = "";
     setTimeout(nextAthlete, 800);
   }
 });
 
-function setMode(m) {
-  mode = m;
-  daily = 0;
+function setMode() {
   streak = 0;
+  daily = 0;
   queue = shuffle([...athletes]);
   index = 0;
   nextAthlete();
-  update();
+  updateStats();
 }
 
-function update() {
+function updateStats() {
   streakEl.textContent = streak;
   bestEl.textContent = best;
   dailyEl.textContent = daily;
-  renderAchievements();
-  renderLeaderboard();
 }
 
-function renderAchievements() {
-  achievementsBox.innerHTML = "";
-  achievements.forEach(a => {
-    const div = document.createElement("div");
-    div.className = "achievement " + (a.check() ? "unlocked" : "");
-    div.textContent = a.name;
-    achievementsBox.appendChild(div);
-  });
-}
-
-function saveScore() {
-  const name = username.value || "Anonymous";
-  let board = JSON.parse(localStorage.board || "[]");
-  board.push({name, score: best});
-  board.sort((a,b)=>b.score-a.score);
-  localStorage.board = JSON.stringify(board.slice(0,5));
-}
-
-function renderLeaderboard() {
-  leaderboard.innerHTML = "";
-  const board = JSON.parse(localStorage.board || "[]");
-  board.forEach((b,i)=>{
-    const div = document.createElement("div");
-    div.textContent = `${i+1}. ${b.name} – ${b.score}`;
-    leaderboard.appendChild(div);
-  });
-}
-
+/* ---------- INIT ---------- */
+bestEl.textContent = best;
 nextAthlete();
-update();
 </script>
 </body>
 </html>
