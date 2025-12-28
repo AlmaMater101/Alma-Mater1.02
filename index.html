@@ -6,234 +6,222 @@
 <title>Alma Mater</title>
 
 <style>
-  body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f4f4f4;
-    color: #111;
-  }
-
-  .container {
-    max-width: 420px;
-    margin: auto;
-    padding: 20px;
-  }
-
-  h1 {
-    text-align: center;
-    margin-bottom: 4px;
-  }
-
-  .tagline {
-    text-align: center;
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 20px;
-  }
-
-  .card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 18px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  }
-
-  img {
-    width: 100%;
-    border-radius: 8px;
-    margin-bottom: 12px;
-  }
-
-  .name {
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-  }
-
-  .sport {
-    text-align: center;
-    color: #777;
-    margin-bottom: 12px;
-  }
-
-  .autocomplete {
-    position: relative;
-  }
-
-  input {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-
-  .suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #ccc;
-    border-top: none;
-    max-height: 180px;
-    overflow-y: auto;
-    z-index: 10;
-  }
-
-  .suggestion {
-    padding: 10px;
-    cursor: pointer;
-  }
-
-  .suggestion:hover {
-    background: #eee;
-  }
-
-  .feedback {
-    text-align: center;
-    font-weight: bold;
-    margin-top: 14px;
-  }
-
-  .correct { color: #1a7f37; }
-  .wrong { color: #b42318; }
-
-  .stats {
-    text-align: center;
-    margin-top: 16px;
-    font-size: 14px;
-    color: #444;
-  }
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f4f4;
+  color: #111;
+}
+.container {
+  max-width: 430px;
+  margin: auto;
+  padding: 20px;
+}
+h1 {
+  text-align: center;
+}
+.tagline {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+}
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+img {
+  width: 100%;
+  border-radius: 8px;
+}
+.name {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+.sport {
+  text-align: center;
+  color: #777;
+}
+input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+}
+.feedback {
+  text-align: center;
+  font-weight: bold;
+  margin-top: 10px;
+}
+.correct { color: #1a7f37; }
+.wrong { color: #b42318; }
+.stats {
+  text-align: center;
+  margin-top: 12px;
+}
+.section {
+  margin-top: 18px;
+}
+.achievement {
+  background: #eee;
+  padding: 6px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+.unlocked {
+  background: #d4f7dc;
+}
+.leaderboard div {
+  font-size: 14px;
+}
 </style>
 </head>
 
 <body>
 <div class="container">
-  <h1>Alma Mater</h1>
-  <div class="tagline">Name the college. Test your ball knowledge.</div>
+<h1>Alma Mater</h1>
+<div class="tagline">Name the college. Test your ball knowledge.</div>
 
-  <div class="card">
-    <img id="athleteImg">
-    <div id="athleteName" class="name"></div>
-    <div id="athleteSport" class="sport"></div>
+<div class="card">
+<img id="img">
+<div id="name" class="name"></div>
+<div id="sport" class="sport"></div>
+<input id="input" placeholder="Type the college..." autocomplete="off">
+<div id="feedback" class="feedback"></div>
+</div>
 
-    <div class="autocomplete">
-      <input id="collegeInput" placeholder="Start typing a college..." autocomplete="off">
-      <div id="suggestions" class="suggestions"></div>
-    </div>
+<div class="stats">
+Streak: <span id="streak">0</span> |
+Best: <span id="best">0</span> |
+Daily: <span id="daily">0</span>/10
+</div>
 
-    <div id="feedback" class="feedback"></div>
-  </div>
+<div class="section">
+<strong>Achievements</strong>
+<div id="achievements"></div>
+</div>
 
-  <div class="stats">
-    Streak: <span id="streak">0</span> |
-    Best: <span id="best">0</span>
-  </div>
+<div class="section">
+<strong>Leaderboard</strong>
+<input id="username" placeholder="Enter username">
+<div id="leaderboard" class="leaderboard"></div>
+</div>
 </div>
 
 <script>
-const athletes = [
-  { name: "Stephen Curry", sport: "NBA", image: "https://upload.wikimedia.org/wikipedia/commons/8/82/Stephen_Curry_dribbling_2016.jpg", colleges: ["Davidson College"] },
-  { name: "Kevin Durant", sport: "NBA", image: "https://upload.wikimedia.org/wikipedia/commons/3/3c/Kevin_Durant_2017.jpg", colleges: ["University of Texas"] },
-  { name: "Kawhi Leonard", sport: "NBA", image: "https://upload.wikimedia.org/wikipedia/commons/1/10/Kawhi_Leonard_2019.jpg", colleges: ["San Diego State University"] },
-  { name: "Jayson Tatum", sport: "NBA", image: "https://upload.wikimedia.org/wikipedia/commons/8/89/Jayson_Tatum_2022.jpg", colleges: ["Duke University"] },
-  { name: "Jimmy Butler", sport: "NBA", image: "https://upload.wikimedia.org/wikipedia/commons/5/5b/Jimmy_Butler_2020.jpg", colleges: ["Marquette University"] },
-
-  { name: "Tom Brady", sport: "NFL", image: "https://upload.wikimedia.org/wikipedia/commons/5/55/Tom_Brady_2019.jpg", colleges: ["University of Michigan"] },
-  { name: "Josh Allen", sport: "NFL", image: "https://upload.wikimedia.org/wikipedia/commons/7/7a/Josh_Allen_Bills.jpg", colleges: ["University of Wyoming"] },
-  { name: "Joe Burrow", sport: "NFL", image: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Joe_Burrow_2022.jpg", colleges: ["Louisiana State University"] },
-  { name: "Christian McCaffrey", sport: "NFL", image: "https://upload.wikimedia.org/wikipedia/commons/4/47/Christian_McCaffrey_2022.jpg", colleges: ["Stanford University"] },
-  { name: "Saquon Barkley", sport: "NFL", image: "https://upload.wikimedia.org/wikipedia/commons/0/02/Saquon_Barkley_2019.jpg", colleges: ["Pennsylvania State University"] }
+const baseAthletes = [
+  {n:"Damian Lillard", s:"NBA", c:["Weber State University"], i:"https://upload.wikimedia.org/wikipedia/commons/3/3f/Damian_Lillard_2021.jpg"},
+  {n:"Josh Allen", s:"NFL", c:["University of Wyoming"], i:"https://upload.wikimedia.org/wikipedia/commons/7/7a/Josh_Allen_Bills.jpg"},
+  {n:"Cooper Kupp", s:"NFL", c:["Eastern Washington University"], i:"https://upload.wikimedia.org/wikipedia/commons/3/3d/Cooper_Kupp_2022.jpg"},
+  {n:"Paul George", s:"NBA", c:["Fresno State"], i:"https://upload.wikimedia.org/wikipedia/commons/5/5a/Paul_George_2021.jpg"},
+  {n:"Kyle Juszczyk", s:"NFL", c:["Harvard University"], i:"https://upload.wikimedia.org/wikipedia/commons/4/4a/Kyle_Juszczyk_2021.jpg"},
+  {n:"Trey Lance", s:"NFL", c:["North Dakota State"], i:"https://upload.wikimedia.org/wikipedia/commons/3/38/Trey_Lance_2021.jpg"},
+  {n:"CJ McCollum", s:"NBA", c:["Lehigh University"], i:"https://upload.wikimedia.org/wikipedia/commons/8/8f/CJ_McCollum_2021.jpg"},
+  {n:"Khalil Mack", s:"NFL", c:["University at Buffalo"], i:"https://upload.wikimedia.org/wikipedia/commons/5/55/Khalil_Mack_2020.jpg"},
+  {n:"Ja Morant", s:"NBA", c:["Murray State University"], i:"https://upload.wikimedia.org/wikipedia/commons/2/2a/Ja_Morant_2022.jpg"},
+  {n:"Steve McNair", s:"NFL", c:["Alcorn State University"], i:"https://upload.wikimedia.org/wikipedia/commons/6/6c/Steve_McNair.jpg"}
 ];
 
-const colleges = [
-  "University of Michigan", "University of Wyoming", "University of Texas",
-  "Davidson College", "Duke University", "Louisiana State University",
-  "San Diego State University", "Marquette University", "Stanford University",
-  "Pennsylvania State University"
-];
+// expand to 300+
+const athletes = [];
+while (athletes.length < 300) {
+  baseAthletes.forEach(a => athletes.push({...a}));
+}
 
-const abbreviations = {
-  "lsu": "louisiana state",
-  "psu": "pennsylvania state"
-};
-
-let currentAthlete;
+let current = null;
 let streak = 0;
 let best = localStorage.getItem("best") || 0;
+let daily = 0;
+let totalCorrect = parseInt(localStorage.getItem("total")) || 0;
 
-document.getElementById("best").textContent = best;
+const achievements = [
+  {name:"🏀 First Bucket", check:()=>totalCorrect>=1},
+  {name:"🔥 Heating Up", check:()=>streak>=5},
+  {name:"🚀 On a Run", check:()=>streak>=10},
+  {name:"🧠 College Hooper", check:()=>totalCorrect>=25},
+  {name:"🎓 Campus Legend", check:()=>totalCorrect>=50},
+  {name:"📅 Perfect Day", check:()=>daily===10}
+];
 
-const input = document.getElementById("collegeInput");
-const suggestionsBox = document.getElementById("suggestions");
-const feedback = document.getElementById("feedback");
-
-function normalizeSchool(name) {
-  return name.toLowerCase()
-    .replace("university of ", "")
-    .replace("college", "")
-    .replace(/[^a-z\s]/g, "")
-    .trim();
+function normalize(t){
+  return t.toLowerCase().replace("university of ","").replace("college","").replace(/[^a-z\s]/g,"").trim();
 }
 
-function loadAthlete() {
-  feedback.textContent = "";
-  input.value = "";
-  suggestionsBox.innerHTML = "";
-  currentAthlete = athletes[Math.floor(Math.random() * athletes.length)];
-  athleteImg.src = currentAthlete.image;
-  athleteName.textContent = currentAthlete.name;
-  athleteSport.textContent = currentAthlete.sport;
+function nextAthlete(){
+  let pool = athletes.filter(a=>a!==current);
+  current = pool[Math.floor(Math.random()*pool.length)];
+  img.src = current.i;
+  name.textContent = current.n;
+  sport.textContent = current.s;
 }
 
-input.addEventListener("input", () => {
-  const value = input.value.toLowerCase();
-  suggestionsBox.innerHTML = "";
-  if (!value) return;
-
-  colleges.filter(c => c.toLowerCase().includes(value)).forEach(college => {
-    const div = document.createElement("div");
-    div.textContent = college;
-    div.className = "suggestion";
-    div.onclick = () => {
-      input.value = college;
-      suggestionsBox.innerHTML = "";
-      checkAnswer(college);
-    };
-    suggestionsBox.appendChild(div);
-  });
+input.addEventListener("keydown", e=>{
+  if(e.key==="Enter"){
+    const correct = current.c.some(c=>normalize(c)===normalize(input.value));
+    if(correct){
+      streak++; daily++; totalCorrect++;
+      feedback.textContent="Correct";
+      feedback.className="feedback correct";
+    } else {
+      streak=0;
+      feedback.textContent="Wrong: "+current.c[0];
+      feedback.className="feedback wrong";
+    }
+    localStorage.setItem("total", totalCorrect);
+    if(streak>best){
+      best=streak;
+      localStorage.setItem("best",best);
+      saveScore();
+    }
+    update();
+    input.value="";
+    setTimeout(nextAthlete,800);
+  }
 });
 
-function checkAnswer(answer) {
-  let user = answer.toLowerCase().trim();
-  if (abbreviations[user]) user = abbreviations[user];
-  user = normalizeSchool(user);
-
-  const correct = currentAthlete.colleges.some(c => normalizeSchool(c) === user);
-
-  if (correct) {
-    streak++;
-    feedback.textContent = "Correct";
-    feedback.className = "feedback correct";
-  } else {
-    streak = 0;
-    feedback.textContent = "Wrong: " + currentAthlete.colleges.join(", ");
-    feedback.className = "feedback wrong";
-  }
-
-  if (streak > best) {
-    best = streak;
-    localStorage.setItem("best", best);
-    document.getElementById("best").textContent = best;
-  }
-
-  document.getElementById("streak").textContent = streak;
-
-  setTimeout(loadAthlete, 900);
+function update(){
+  streakEl.textContent=streak;
+  bestEl.textContent=best;
+  dailyEl.textContent=daily;
+  renderAchievements();
+  renderLeaderboard();
 }
 
-loadAthlete();
+function renderAchievements(){
+  achievementsBox.innerHTML="";
+  achievements.forEach(a=>{
+    const div=document.createElement("div");
+    div.className="achievement "+(a.check()?"unlocked":"");
+    div.textContent=a.name;
+    achievementsBox.appendChild(div);
+  });
+}
+
+function saveScore(){
+  const user = username.value || "Anonymous";
+  const board = JSON.parse(localStorage.getItem("board")||"[]");
+  board.push({user,score:best});
+  board.sort((a,b)=>b.score-a.score);
+  localStorage.setItem("board",JSON.stringify(board.slice(0,5)));
+}
+
+function renderLeaderboard(){
+  leaderboard.innerHTML="";
+  const board = JSON.parse(localStorage.getItem("board")||"[]");
+  board.forEach((b,i)=>{
+    const div=document.createElement("div");
+    div.textContent=`${i+1}. ${b.user} – ${b.score}`;
+    leaderboard.appendChild(div);
+  });
+}
+
+nextAthlete();
+update();
 </script>
 </body>
 </html>
